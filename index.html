@@ -1,0 +1,1691 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>학생 상담 등록</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --surface: #ffffff;
+      --surface-muted: #f8fbff;
+      --line: #dde5f0;
+      --line-strong: #c6d2e3;
+      --text: #1e2a37;
+      --text-muted: #697586;
+      --primary: #2f9bf4;
+      --primary-dark: #1f82d6;
+      --primary-soft: #e9f4ff;
+      --navy: #111827;
+      --success: #11a36a;
+      --danger: #ff6b6b;
+      --warning: #f59e0b;
+      --shadow: 0 18px 40px rgba(25, 51, 84, 0.12);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Pretendard", "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top right, rgba(47, 155, 244, 0.12), transparent 18%),
+        linear-gradient(180deg, #f8fbff 0%, #eef4fb 100%);
+      color: var(--text);
+    }
+
+    .app-shell {
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      background: rgba(255, 255, 255, 0.85);
+      border-right: 1px solid rgba(207, 219, 233, 0.8);
+      backdrop-filter: blur(18px);
+      padding: 22px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .logo {
+      width: 54px;
+      height: 54px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #111827 0%, #2c374a 100%);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      box-shadow: var(--shadow);
+    }
+
+    .nav-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 18px;
+      border: 1px solid transparent;
+      display: grid;
+      place-items: center;
+      color: var(--text-muted);
+      background: transparent;
+      font-size: 12px;
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    .nav-icon.active {
+      background: var(--primary-soft);
+      color: var(--primary);
+      border-color: #c8e3ff;
+      font-weight: 700;
+    }
+
+    .main {
+      padding: 18px 22px 24px;
+    }
+
+    .topbar {
+      height: 72px;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid rgba(217, 227, 239, 0.9);
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      margin-bottom: 18px;
+      backdrop-filter: blur(14px);
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .brand {
+      font-size: 32px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+    }
+
+    .chip-dark {
+      background: #111;
+      color: #fff;
+      border-radius: 999px;
+      padding: 12px 22px;
+      font-weight: 700;
+      min-width: 96px;
+      text-align: center;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ff9c49, #ff6d3d);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+    }
+
+    .page-card {
+      height: calc(100vh - 132px);
+      min-height: 860px;
+      border-radius: 32px;
+      overflow: hidden;
+      border: 1px solid #dce6f2;
+      box-shadow: var(--shadow);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(247, 250, 255, 0.96) 100%);
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    .page-header {
+      padding: 28px 32px 18px;
+      border-bottom: 1px solid #e6edf6;
+      background: linear-gradient(180deg, rgba(249, 251, 255, 0.95), rgba(244, 248, 253, 0.9));
+    }
+
+    .page-header h1 {
+      margin: 0;
+      font-size: 34px;
+      letter-spacing: -0.03em;
+    }
+
+    .page-header p {
+      margin: 8px 0 0;
+      color: var(--text-muted);
+      font-size: 15px;
+    }
+
+    .split-layout {
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+      min-height: 0;
+      transition: grid-template-rows 0.32s ease;
+    }
+
+    .split-layout.collapsed {
+      grid-template-rows: 110px 1fr;
+    }
+
+    .panel {
+      min-height: 0;
+      padding: 24px 28px;
+      overflow: auto;
+      transition: padding 0.28s ease, opacity 0.28s ease;
+    }
+
+    .panel + .panel {
+      border-top: 1px solid #dde8f4;
+      background: linear-gradient(180deg, #fcfdff 0%, #f5f9ff 100%);
+    }
+
+    .split-layout.collapsed .query-panel {
+      padding-bottom: 14px;
+      overflow: hidden;
+    }
+
+    .split-layout.collapsed .query-panel .search-card {
+      opacity: 0;
+      transform: translateY(-10px);
+      pointer-events: none;
+      max-height: 0;
+      margin: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      border-width: 0;
+      box-shadow: none;
+      overflow: hidden;
+      transition: all 0.28s ease;
+    }
+
+    .split-layout.collapsed .query-panel .panel-head {
+      margin-bottom: 0;
+      align-items: center;
+    }
+
+    .split-layout.collapsed .query-panel .title-wrap p {
+      display: none;
+    }
+
+    .split-layout.collapsed .input-panel {
+      padding-top: 28px;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .title-wrap h2 {
+      margin: 0;
+      font-size: 24px;
+      letter-spacing: -0.02em;
+    }
+
+    .title-wrap p {
+      margin: 8px 0 0;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      height: 46px;
+      padding: 0 18px;
+      border-radius: 14px;
+      border: 1px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.18s ease;
+      text-decoration: none;
+    }
+
+    .btn.primary {
+      background: linear-gradient(180deg, #39a7ff 0%, #2392ed 100%);
+      color: #fff;
+      box-shadow: 0 10px 24px rgba(47, 155, 244, 0.22);
+    }
+
+    .btn.primary:hover {
+      background: linear-gradient(180deg, #2392ed 0%, #157bd0 100%);
+    }
+
+    .btn.secondary {
+      background: #fff;
+      color: var(--primary);
+      border-color: #abd6ff;
+    }
+
+    .btn.light {
+      background: #f0f4f8;
+      color: var(--text-muted);
+      border-color: #e0e7ef;
+    }
+
+    .btn.ghost {
+      background: rgba(255, 255, 255, 0.7);
+      color: #46617d;
+      border-color: #d8e4f0;
+    }
+
+    .search-card,
+    .summary-card,
+    .form-card {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #dbe6f2;
+      border-radius: 22px;
+      box-shadow: 0 12px 30px rgba(53, 92, 140, 0.08);
+    }
+
+    .search-card {
+      padding: 18px;
+    }
+
+    .section-label {
+      font-size: 14px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      color: #334155;
+    }
+
+    .filters {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr auto auto;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .field,
+    .select,
+    textarea {
+      width: 100%;
+      border: 1px solid #d9e3ee;
+      background: #fff;
+      border-radius: 14px;
+      padding: 13px 14px;
+      font-size: 14px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .field:focus,
+    .select:focus,
+    textarea:focus {
+      border-color: #66b7ff;
+      box-shadow: 0 0 0 4px rgba(47, 155, 244, 0.12);
+    }
+
+    .table-wrap {
+      border: 1px solid #d7e2ef;
+      border-radius: 18px;
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead th {
+      background: #f4f8fc;
+      color: #516074;
+      font-size: 12px;
+      text-align: left;
+      padding: 14px 14px;
+      font-weight: 800;
+    }
+
+    tbody td {
+      padding: 14px;
+      border-top: 1px solid #edf2f7;
+      font-size: 14px;
+    }
+
+    tbody tr.selected {
+      background: #edf6ff;
+      box-shadow: inset 0 0 0 1px #c5e0ff;
+    }
+
+    .radio-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid #9eb0c5;
+      display: inline-grid;
+      place-items: center;
+    }
+
+    .radio-dot::after {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: transparent;
+    }
+
+    tr.selected .radio-dot {
+      border-color: var(--primary);
+    }
+
+    tr.selected .radio-dot::after {
+      background: var(--primary);
+    }
+
+    .query-footer {
+      margin-top: 14px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .selection-banner {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 14px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #edf6ff 0%, #e5f1ff 100%);
+      border: 1px solid #c9dfff;
+    }
+
+    .selection-banner strong {
+      display: block;
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+
+    .selection-banner span {
+      font-size: 13px;
+      color: #577089;
+    }
+
+    .split-layout.collapsed .selection-banner {
+      display: flex;
+    }
+
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 18px;
+      min-height: 0;
+    }
+
+    .summary-card {
+      padding: 20px;
+      display: grid;
+      grid-template-rows: auto auto auto 1fr;
+      gap: 14px;
+      min-height: 0;
+    }
+
+    .summary-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .summary-header h3 {
+      margin: 0;
+      font-size: 19px;
+    }
+
+    .mini-table {
+      border: 1px solid #dce7f3;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .score-strip {
+      display: grid;
+      grid-template-columns: 120px 82px 1fr;
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .score-card,
+    .score-note,
+    .history-box {
+      border-radius: 16px;
+      border: 1px solid #dce6f0;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+      padding: 14px;
+    }
+
+    .score-card strong {
+      display: block;
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .score-main {
+      font-size: 34px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+    }
+
+    .score-note {
+      display: grid;
+      place-items: center;
+      text-align: center;
+    }
+
+    .score-note .small {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .score-note .large {
+      margin-top: 8px;
+      font-size: 32px;
+      color: #4b6bff;
+      font-weight: 900;
+    }
+
+    .history-box {
+      min-height: 132px;
+    }
+
+    .history-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .history-item {
+      display: grid;
+      grid-template-columns: 88px 1fr auto;
+      gap: 12px;
+      padding: 12px 0;
+      border-top: 1px solid #eef3f8;
+      font-size: 13px;
+      align-items: center;
+    }
+
+    .history-item:first-of-type {
+      border-top: 0;
+      padding-top: 0;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: #eff6ff;
+      color: #1570c9;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .tag.warning {
+      background: #fff3e1;
+      color: #cc8400;
+    }
+
+    .memo-box {
+      border: 1px solid #dce5f1;
+      border-radius: 16px;
+      padding: 14px;
+      background: #fbfdff;
+      min-height: 104px;
+      color: #4c5a6d;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .form-area {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 16px;
+      min-height: 0;
+    }
+
+    .form-card {
+      padding: 18px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .form-group {
+      display: grid;
+      gap: 8px;
+    }
+
+    .form-group.span-2 {
+      grid-column: span 2;
+    }
+
+    .label {
+      font-size: 13px;
+      font-weight: 800;
+      color: #3a4756;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .required {
+      color: #ff8b00;
+    }
+
+    .inline-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+    }
+
+    .pill-selects {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pill {
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: #eef4fb;
+      color: #4d6074;
+      font-size: 13px;
+      border: 1px solid #d8e3ee;
+    }
+
+    .pill.active {
+      background: #e7f3ff;
+      color: var(--primary);
+      border-color: #b7d9ff;
+      font-weight: 700;
+    }
+
+    .textarea-large {
+      min-height: 128px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    .textarea-mid {
+      min-height: 86px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    .form-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .helper {
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 28px;
+      z-index: 30;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal {
+      width: min(1500px, 96vw);
+      max-height: 88vh;
+      background: #fff;
+      border-radius: 28px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.28);
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 28px 32px 22px;
+    }
+
+    .modal-head h2 {
+      margin: 0;
+      font-size: 28px;
+      letter-spacing: -0.03em;
+    }
+
+    .modal-head h2 span {
+      color: #9aa4b2;
+      font-weight: 700;
+      margin-left: 6px;
+    }
+
+    .icon-btn {
+      border: 0;
+      background: transparent;
+      font-size: 28px;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      cursor: pointer;
+      color: #101828;
+    }
+
+    .modal-body {
+      padding: 0 28px 28px;
+      overflow: auto;
+    }
+
+    .modal-table {
+      border-radius: 24px;
+      overflow: hidden;
+      border: 1px solid #edf1f7;
+    }
+
+    .modal-table thead th {
+      background: #121212;
+      color: #fff;
+      font-size: 16px;
+      padding: 18px 20px;
+    }
+
+    .modal-table tbody td {
+      font-size: 18px;
+      color: #556273;
+      padding: 22px 20px;
+      border-top: 1px solid #edf1f7;
+    }
+
+    .modal-table .score-cell {
+      font-weight: 800;
+      color: #384556;
+    }
+
+    .inspect {
+      font-size: 28px;
+      text-align: center;
+    }
+
+    .student-register-modal {
+      width: min(1620px, 96vw);
+      max-height: 92vh;
+    }
+
+    .student-register-body {
+      padding: 0 30px 30px;
+      overflow: auto;
+      background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+    }
+
+    .student-status-wrap {
+      display: grid;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .student-status-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .student-status-title .auto {
+      color: #0f7ef0;
+    }
+
+    .status-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .status-card {
+      border: 1px solid #d8e2ee;
+      border-radius: 18px;
+      background: linear-gradient(180deg, #f6f8fb 0%, #eef3f8 100%);
+      padding: 18px 18px 16px;
+      min-height: 92px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .status-card.active {
+      border-color: #7bbcff;
+      background: linear-gradient(180deg, #f5faff 0%, #eef6ff 100%);
+      box-shadow: 0 12px 24px rgba(47, 155, 244, 0.12);
+    }
+
+    .status-card strong {
+      display: block;
+      font-size: 15px;
+      margin-bottom: 6px;
+    }
+
+    .status-card p {
+      margin: 0;
+      color: #6b7888;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .status-radio {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid #a9b7c8;
+      margin-top: 2px;
+      display: grid;
+      place-items: center;
+      background: #fff;
+    }
+
+    .status-card.active .status-radio {
+      border-color: #5caeff;
+    }
+
+    .status-card.active .status-radio::after {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #4ea7ff;
+    }
+
+    .student-register-shell {
+      display: grid;
+      grid-template-columns: minmax(760px, 980px);
+      gap: 24px;
+    }
+
+    .created-date {
+      font-size: 15px;
+      color: #49576a;
+      margin-bottom: 8px;
+    }
+
+    .register-card {
+      border: 1px solid #d9e3ef;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.98);
+      padding: 26px 28px;
+      box-shadow: 0 14px 34px rgba(44, 78, 118, 0.08);
+    }
+
+    .register-card h3 {
+      margin: 0 0 24px;
+      font-size: 22px;
+      letter-spacing: -0.02em;
+    }
+
+    .student-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px 18px;
+    }
+
+    .student-form-grid .span-2 {
+      grid-column: span 2;
+    }
+
+    .student-inline-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 1fr;
+      gap: 10px;
+    }
+
+    .phone-grid,
+    .email-grid,
+    .identity-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      align-items: end;
+    }
+
+    .identity-grid {
+      grid-template-columns: 1fr 96px 1fr 1fr;
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #304254;
+      margin-top: 2px;
+    }
+
+    .checkbox-row input {
+      width: 18px;
+      height: 18px;
+      accent-color: #2f9bf4;
+    }
+
+    .gender-pills {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .gender-pill {
+      min-width: 34px;
+      height: 36px;
+      border-radius: 10px;
+      border: 1px solid #d4deea;
+      background: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: #46586a;
+    }
+
+    .gender-pill.active {
+      border-color: #89c5ff;
+      background: #eef7ff;
+      color: #1888e3;
+    }
+
+    .memo-input-wrap {
+      display: grid;
+      grid-template-columns: 1fr 42px;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .mini-add-btn {
+      height: 44px;
+      border-radius: 12px;
+      border: 1px solid #9cc9ff;
+      background: #f4faff;
+      color: #208be5;
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    .memo-history {
+      margin-top: 12px;
+      border: 1px solid #dbe5f0;
+      border-radius: 16px;
+      background: #f8fbff;
+      padding: 14px 16px;
+      min-height: 74px;
+      color: #445367;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .register-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 18px;
+      gap: 12px;
+    }
+
+    @media (max-width: 1440px) {
+      .filters {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .bottom-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .status-cards,
+      .student-form-grid,
+      .phone-grid,
+      .email-grid,
+      .identity-grid,
+      .student-inline-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .student-register-shell {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .app-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .page-card {
+        height: auto;
+      }
+
+      .split-layout {
+        grid-template-rows: auto auto;
+      }
+
+      .form-grid,
+      .inline-controls {
+        grid-template-columns: 1fr;
+      }
+
+      .filters {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .main {
+        padding: 12px;
+      }
+
+      .page-header,
+      .panel {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
+      .topbar {
+        padding: 0 16px;
+      }
+
+      .brand {
+        font-size: 24px;
+      }
+
+      .filters,
+      .score-strip {
+        grid-template-columns: 1fr;
+      }
+
+      .modal-table tbody td,
+      .modal-table thead th {
+        font-size: 14px;
+        padding: 14px 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo">G+</div>
+      <div class="nav-icon">대시보드</div>
+      <div class="nav-icon">수업 관리</div>
+      <div class="nav-icon">학생 관리</div>
+      <div class="nav-icon active">상담 관리</div>
+      <div class="nav-icon">결제 관리</div>
+      <div class="nav-icon">설정</div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div class="topbar-left">
+          <div class="brand">GATE+</div>
+          <div class="chip-dark">ACA</div>
+        </div>
+        <div class="topbar-right">
+          <div class="avatar">M</div>
+          <div>메이커스 어학원</div>
+          <div>|</div>
+          <div><strong>관리자 (김성명)</strong></div>
+        </div>
+      </div>
+
+      <section class="page-card">
+        <header class="page-header">
+          <h1>학생 상담 등록</h1>
+          <p>기존 학생을 조회해 선택하거나 신규 학생을 등록한 뒤 상담 상세 내용을 작성합니다.</p>
+        </header>
+
+        <div class="split-layout">
+          <section class="panel query-panel">
+            <div class="panel-head">
+              <div class="title-wrap">
+                <h2>상담 학생 조회</h2>
+                <p>상단은 조회 전용 영역입니다. 검색 결과에서 학생 1명을 선택하면 아래 입력 영역에 정보가 반영됩니다.</p>
+              </div>
+              <div class="action-row">
+                <button class="btn secondary" type="button" id="openStudentModalBtn">+ 신규 학생 등록</button>
+                <button class="btn ghost" type="button" id="toggleQueryBtn" style="display:none;">조회 다시 열기</button>
+              </div>
+            </div>
+
+            <div class="search-card">
+              <div class="section-label">학생 정보</div>
+              <div class="filters">
+                <input class="field" type="text" value="김학생" aria-label="학생명">
+                <input class="field" type="text" placeholder="학교">
+                <input class="field" type="text" placeholder="학생 휴대폰">
+                <input class="field" type="text" placeholder="학부모 휴대폰">
+                <button class="btn primary">검색</button>
+                <button class="btn light">초기화</button>
+              </div>
+
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th style="width: 72px;">선택</th>
+                      <th>학생명</th>
+                      <th>학교</th>
+                      <th>학년</th>
+                      <th>학생 휴대폰</th>
+                      <th>학부모 휴대폰</th>
+                      <th>학생 이메일</th>
+                      <th>학생 상태</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="selected">
+                      <td><span class="radio-dot"></span></td>
+                      <td>김학생</td>
+                      <td>매버릭스고</td>
+                      <td>10</td>
+                      <td>010-1234-5678</td>
+                      <td>010-9876-5432</td>
+                      <td>dfadsf@gmail.com</td>
+                      <td>재원생</td>
+                    </tr>
+                    <tr>
+                      <td><span class="radio-dot"></span></td>
+                      <td>김학훈</td>
+                      <td>게이트중</td>
+                      <td>10</td>
+                      <td>010-2222-3333</td>
+                      <td>010-4444-5555</td>
+                      <td>dfadsf@gmail.com</td>
+                      <td>재원생</td>
+                    </tr>
+                    <tr>
+                      <td><span class="radio-dot"></span></td>
+                      <td>김새움</td>
+                      <td>ACA국제학교</td>
+                      <td>10</td>
+                      <td>010-7777-8888</td>
+                      <td>010-9999-0000</td>
+                      <td>dfadsf@gmail.com</td>
+                      <td>재원생</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="query-footer">
+                <button class="btn primary" type="button" id="selectStudentBtn">학생 선택</button>
+              </div>
+            </div>
+
+            <div class="selection-banner" id="selectionBanner">
+              <div>
+                <strong>김학생 학생이 선택되었습니다.</strong>
+                <span>조회 영역은 접혔고, 아래 상담 입력 영역이 넓어졌습니다.</span>
+              </div>
+              <button class="btn secondary" type="button" id="reopenQueryBtn">조회 영역 펼치기</button>
+            </div>
+          </section>
+
+          <section class="panel input-panel">
+            <div class="panel-head">
+              <div class="title-wrap">
+                <h2>상담 입력</h2>
+                <p>하단은 상담 내용 작성 전용 영역입니다. 학생 요약, 수업 정보, 상담 정보, 상담 내용을 한 화면에서 이어서 입력합니다.</p>
+              </div>
+              <div class="action-row">
+                <span class="tag">선택 학생 반영 완료</span>
+              </div>
+            </div>
+
+            <div class="bottom-grid">
+              <aside class="summary-card">
+                <div class="summary-header">
+                  <h3>학생 정보 요약</h3>
+                  <button class="btn secondary" id="openModalBtn">시험 정보 상세 보기</button>
+                </div>
+
+                <div class="mini-table">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>학생명</th>
+                        <th>학교</th>
+                        <th>성별</th>
+                        <th>학년</th>
+                        <th>학생 상태</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>김학생</td>
+                        <td>매버릭스고</td>
+                        <td>여</td>
+                        <td>10</td>
+                        <td>재원생</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div>
+                  <div class="section-label">최근 성적 정보</div>
+                  <div class="score-strip">
+                    <div class="score-card">
+                      <strong>SAT · 26.01.01</strong>
+                      <div class="score-main">440</div>
+                    </div>
+                    <div class="score-note">
+                      <div class="small">AP Score</div>
+                      <div class="large">4</div>
+                    </div>
+                    <div class="history-box">
+                      <div class="helper">2023 Summer_0616_This Writer Cooks</div>
+                      <div style="margin-top:8px; line-height:1.7; font-size:13px;">
+                        English 6 / Math 13 / Reading 15 / Science 14 / Composite Score 12
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="history-box">
+                  <div class="history-head">
+                    <div class="section-label" style="margin:0;">이전 상담 내역</div>
+                    <button class="btn secondary">상담 정보 더 보기</button>
+                  </div>
+
+                  <div class="history-item">
+                    <div>2026.01.01</div>
+                    <div>[문의수업분류] 2025 SAT 특강 / 상담경로(전화) / 한 수업명</div>
+                    <div class="tag warning">재확인 필요</div>
+                  </div>
+                  <div class="history-item">
+                    <div>2025.12.20</div>
+                    <div>학생/학부모 요청사항 및 상담 내용 요약. 방문 상담 후 등록 여부 결정 예정.</div>
+                    <button class="btn secondary">상담 상세</button>
+                  </div>
+                </div>
+
+                <div class="memo-box">
+                  <div class="section-label" style="margin-bottom:8px;">학생 특이사항</div>
+                  26.01.01 / 관리자 메모: 독서 지문은 강점이 있고, 수학은 주말반 선호. 방문 상담 후 등록 여부를 최종 확인 예정입니다.
+                </div>
+              </aside>
+
+              <div class="form-area">
+                <div class="form-card">
+                  <div class="section-label">문의 수업 정보</div>
+                  <div class="form-grid">
+                    <div class="form-group">
+                      <label class="label">수업 분류 <span class="required">선택</span></label>
+                      <select class="select">
+                        <option>2025 개인수업</option>
+                        <option>2025 SAT</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label class="label">수업명</label>
+                      <select class="select">
+                        <option>2025 SAT 특강</option>
+                        <option>2025 SAT class</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label class="label">관련 테스트</label>
+                      <div class="pill-selects">
+                        <span class="pill active">testgate 데이터</span>
+                        <span class="pill">SAT</span>
+                        <span class="pill">AP</span>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="label">수업 과목</label>
+                      <div class="pill-selects">
+                        <span class="pill active">SAT MATH</span>
+                        <span class="pill">A</span>
+                        <span class="pill">A</span>
+                      </div>
+                    </div>
+                    <div class="form-group span-2">
+                      <label class="label">담당 강사</label>
+                      <select class="select">
+                        <option>김팀장</option>
+                        <option>T.john smith</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-card">
+                  <div class="section-label">상담 정보</div>
+                  <div class="form-grid">
+                    <div class="form-group">
+                      <label class="label">상담일 <span class="required">필수</span></label>
+                      <input class="field" type="text" value="2026. 04. 10.">
+                    </div>
+                    <div class="form-group">
+                      <label class="label">기록자 <span class="required">필수</span></label>
+                      <input class="field" type="text" value="관리자 김성명">
+                    </div>
+                    <div class="form-group">
+                      <label class="label">상담 경로 <span class="required">필수</span></label>
+                      <select class="select">
+                        <option>전화</option>
+                        <option>방문</option>
+                        <option>이메일</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label class="label">수강상태 <span class="required">필수</span></label>
+                      <select class="select">
+                        <option>미등록</option>
+                        <option>등록</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label class="label">상담 대상 <span class="required">필수</span></label>
+                      <select class="select">
+                        <option>학부모</option>
+                        <option>학생</option>
+                        <option>학생/학부모</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label class="label">상담 구분 <span class="required">필수</span></label>
+                      <select class="select">
+                        <option>입학 수강상담</option>
+                        <option>재원생 상담</option>
+                        <option>신규 입학 상담</option>
+                      </select>
+                    </div>
+                    <div class="form-group span-2">
+                      <label class="label">자동 저장 메모</label>
+                      <input class="field" type="text" placeholder="입력된 기본 학생 정보와 문의 수업 정보가 자동 반영됩니다.">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-card">
+                  <div class="section-label">상담 내용</div>
+                  <div class="form-grid">
+                    <div class="form-group span-2">
+                      <label class="label">상담 주제 <span class="required">필수</span></label>
+                      <input class="field" type="text" value="SAT 입학 상담 Select (aca2000)">
+                    </div>
+                    <div class="form-group span-2">
+                      <label class="label">상담 내용 <span class="required">필수</span></label>
+                      <textarea class="textarea-large">전화상 문의. 현재 영어 레벨, 목표 점수, 희망 수강 기간을 확인했습니다. 학부모는 주말반을 선호하며, 방문 상담 후 등록 여부를 결정하고 싶다고 전달했습니다.</textarea>
+                    </div>
+                    <div class="form-group">
+                      <label class="label">후속 관리 (Follow-up) <span class="required">선택</span></label>
+                      <select class="select">
+                        <option>없음 (기본 없음)</option>
+                        <option>재확인 필요</option>
+                        <option>처리 완료</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label class="label">후속 메모</label>
+                      <textarea class="textarea-mid">김실장님 재확인 예정 2026.04.15
+등록 여부 확인을 위해 다시 연락 필요</textarea>
+                    </div>
+                  </div>
+                  <div class="form-footer">
+                    <button class="btn light">임시 저장</button>
+                    <button class="btn primary">상담 등록</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="examModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="examModalTitle">
+      <div class="modal-head">
+        <h2 id="examModalTitle">김학생 <span>(시험 내역)</span></h2>
+        <button class="icon-btn" id="closeModalBtn" aria-label="닫기">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-table">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:80px;">No.</th>
+                <th style="width:190px;">TEST DATE</th>
+                <th>TEST FORMAT</th>
+                <th>CLASS</th>
+                <th>TEST</th>
+                <th style="width:120px;">TOTAL</th>
+                <th style="width:120px;">SCORE</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>6</td>
+                <td>12 / 29 / 2024</td>
+                <td>AP Physics Mechanics</td>
+                <td>6월 시험 대비반</td>
+                <td>RW25-MA23(Hard)</td>
+                <td class="score-cell">3</td>
+                <td class="inspect">⌕</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td>12 / 29 / 2024</td>
+                <td>Macroeconomics</td>
+                <td>6월 시험 대비반</td>
+                <td>RW25-MA23(Hard)</td>
+                <td class="score-cell">2</td>
+                <td class="inspect">⌕</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>12 / 29 / 2024</td>
+                <td>SAT</td>
+                <td>6월 시험 대비반</td>
+                <td>RW25-MA23(Hard)</td>
+                <td class="score-cell">680</td>
+                <td class="inspect">⌕</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>12 / 29 / 2024</td>
+                <td>SAT</td>
+                <td>6월 시험 대비반</td>
+                <td>RW25-MA23(Hard)</td>
+                <td class="score-cell">1550</td>
+                <td class="inspect">⌕</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>12 / 29 / 2024</td>
+                <td>Macroeconomics</td>
+                <td>6월 시험 대비반</td>
+                <td>RW25-MA23(Hard)</td>
+                <td class="score-cell">5</td>
+                <td class="inspect">⌕</td>
+              </tr>
+              <tr>
+                <td>1</td>
+                <td>12 / 29 / 2024</td>
+                <td>SAT</td>
+                <td>6월 시험 대비반</td>
+                <td>RW25-MA23(Hard)</td>
+                <td class="score-cell">1400</td>
+                <td class="inspect">⌕</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="studentRegisterModal" aria-hidden="true">
+    <div class="modal student-register-modal" role="dialog" aria-modal="true" aria-labelledby="studentRegisterModalTitle">
+      <div class="modal-head">
+        <h2 id="studentRegisterModalTitle">학생 등록 <span>(신규 학생 등록)</span></h2>
+        <button class="icon-btn" id="closeStudentModalBtn" aria-label="닫기">✕</button>
+      </div>
+      <div class="student-register-body">
+        <div class="student-status-wrap">
+          <div class="student-status-title">
+            <span>학생 상태</span>
+            <span class="auto">자동</span>
+          </div>
+          <div class="status-cards">
+            <div class="status-card active">
+              <div>
+                <strong>입학상담생</strong>
+                <p>기존 이력이 없거나 아직 수강 이력이 없는 상담 대상 학생입니다.</p>
+              </div>
+              <div class="status-radio" aria-hidden="true"></div>
+            </div>
+            <div class="status-card">
+              <div>
+                <strong>재원생</strong>
+                <p>현재 수강 중인 수업이 있는 학생입니다. 수업/출결/수납 정보와 연결됩니다.</p>
+              </div>
+              <div class="status-radio" aria-hidden="true"></div>
+            </div>
+            <div class="status-card">
+              <div>
+                <strong>퇴원생</strong>
+                <p>현재 수강 중인 수업이 없는 학생입니다. 이전 수강 이력은 보존됩니다.</p>
+              </div>
+              <div class="status-radio" aria-hidden="true"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="student-register-shell">
+          <div>
+            <div class="created-date">최초 생성일 2000.00.00</div>
+            <div class="register-card">
+              <h3>기본 학생 정보</h3>
+
+              <div class="student-form-grid">
+                <div class="form-group">
+                  <label class="label">학생명 <span class="required">필수</span></label>
+                  <input class="field" type="text" placeholder="학생명 입력">
+                </div>
+                <div class="form-group">
+                  <label class="label">학년 <span class="required">필수</span></label>
+                  <input class="field" type="text" placeholder="숫자 입력">
+                </div>
+
+                <div class="form-group span-2">
+                  <label class="label">학교 <span class="helper">기존 학교에서 조회 후 선택해주세요</span></label>
+                  <div class="student-inline-grid">
+                    <input class="field" type="text" placeholder="학교명 검색">
+                    <select class="select">
+                      <option>학교 분류 1 (국내/해외/대학고)</option>
+                    </select>
+                    <select class="select">
+                      <option>학교 분류 2</option>
+                    </select>
+                  </div>
+                  <div class="helper" style="margin-top:6px; color:#2f86ea; font-weight:700;">+ 신규 학교</div>
+                </div>
+
+                <div class="span-2 phone-grid">
+                  <div class="form-group">
+                    <label class="label">학생 휴대폰</label>
+                    <input class="field" type="text" placeholder="전화번호 입력">
+                  </div>
+                  <div class="form-group">
+                    <label class="label">학부모 휴대폰</label>
+                    <input class="field" type="text" placeholder="전화번호 입력">
+                  </div>
+                </div>
+
+                <div class="form-group span-2">
+                  <label class="checkbox-row">
+                    <input type="checkbox" checked>
+                    <span>카카오톡 연락</span>
+                  </label>
+                </div>
+
+                <div class="span-2 email-grid">
+                  <div class="form-group">
+                    <label class="label">학생 이메일</label>
+                    <input class="field" type="text" placeholder="학생 이메일 입력">
+                  </div>
+                  <div class="form-group">
+                    <label class="label">학부모 이메일</label>
+                    <input class="field" type="text" placeholder="학부모 이메일 입력">
+                  </div>
+                </div>
+
+                <div class="span-2 identity-grid">
+                  <div class="form-group">
+                    <label class="label">생년월일</label>
+                    <input class="field" type="text" placeholder="생년월일 입력">
+                  </div>
+                  <div class="form-group">
+                    <label class="label">성별</label>
+                    <div class="gender-pills">
+                      <span class="gender-pill active">남</span>
+                      <span class="gender-pill">여</span>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="label">주소</label>
+                    <input class="field" type="text" placeholder="주소 입력">
+                  </div>
+                  <div class="form-group">
+                    <label class="label">기타 연락망</label>
+                    <input class="field" type="text" placeholder="기타 연락망 입력">
+                  </div>
+                </div>
+
+                <div class="form-group span-2">
+                  <label class="label">학생 특이사항 <span class="helper">관리자 메모용</span></label>
+                  <div class="memo-input-wrap">
+                    <input class="field" type="text" placeholder="특이사항 입력">
+                    <button class="mini-add-btn" type="button">+</button>
+                  </div>
+                  <div class="memo-history">
+                    26.01.01 / 비고 : 씨티은행 23984294782394 어머니 카카오톡 id smsfdl!fajf, 현금영수증 3498239048, 학교위치
+                  </div>
+                </div>
+              </div>
+
+              <div class="register-actions">
+                <button class="btn light" type="button" id="cancelStudentModalBtn">취소</button>
+                <button class="btn primary" type="button">등록</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const modal = document.getElementById("examModal");
+    const openModalBtn = document.getElementById("openModalBtn");
+    const closeModalBtn = document.getElementById("closeModalBtn");
+    const studentRegisterModal = document.getElementById("studentRegisterModal");
+    const openStudentModalBtn = document.getElementById("openStudentModalBtn");
+    const closeStudentModalBtn = document.getElementById("closeStudentModalBtn");
+    const cancelStudentModalBtn = document.getElementById("cancelStudentModalBtn");
+    const splitLayout = document.querySelector(".split-layout");
+    const selectStudentBtn = document.getElementById("selectStudentBtn");
+    const toggleQueryBtn = document.getElementById("toggleQueryBtn");
+    const reopenQueryBtn = document.getElementById("reopenQueryBtn");
+
+    function openModal() {
+      modal.classList.add("open");
+      modal.setAttribute("aria-hidden", "false");
+    }
+
+    function closeModal() {
+      modal.classList.remove("open");
+      modal.setAttribute("aria-hidden", "true");
+    }
+
+    function openStudentModal() {
+      studentRegisterModal.classList.add("open");
+      studentRegisterModal.setAttribute("aria-hidden", "false");
+    }
+
+    function closeStudentModal() {
+      studentRegisterModal.classList.remove("open");
+      studentRegisterModal.setAttribute("aria-hidden", "true");
+    }
+
+    openModalBtn.addEventListener("click", openModal);
+    closeModalBtn.addEventListener("click", closeModal);
+    openStudentModalBtn.addEventListener("click", openStudentModal);
+    closeStudentModalBtn.addEventListener("click", closeStudentModal);
+    cancelStudentModalBtn.addEventListener("click", closeStudentModal);
+    modal.addEventListener("click", function (event) {
+      if (event.target === modal) closeModal();
+    });
+    studentRegisterModal.addEventListener("click", function (event) {
+      if (event.target === studentRegisterModal) closeStudentModal();
+    });
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") {
+        closeModal();
+        closeStudentModal();
+      }
+    });
+
+    function collapseQueryArea() {
+      splitLayout.classList.add("collapsed");
+      toggleQueryBtn.style.display = "inline-flex";
+    }
+
+    function expandQueryArea() {
+      splitLayout.classList.remove("collapsed");
+      toggleQueryBtn.style.display = "none";
+    }
+
+    selectStudentBtn.addEventListener("click", collapseQueryArea);
+    toggleQueryBtn.addEventListener("click", expandQueryArea);
+    reopenQueryBtn.addEventListener("click", expandQueryArea);
+  </script>
+</body>
+</html>
