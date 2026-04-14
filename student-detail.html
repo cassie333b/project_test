@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>학생 상세</title>
+  <style>
+    :root {
+      --bg: #f7f8fa;
+      --surface: #ffffff;
+      --surface-soft: #f7fbff;
+      --line: #e6e9ef;
+      --line-strong: #d8dde6;
+      --text: #262a31;
+      --muted: #7b8494;
+      --blue: #1f9af3;
+      --blue-dark: #0877cc;
+      --green: #159f62;
+      --green-bg: #e9f8f1;
+      --red: #ec4b54;
+      --red-bg: #fff0f1;
+      --amber: #f59e0b;
+      --amber-bg: #fff7e6;
+      --purple: #7557ff;
+      --purple-bg: #f1edff;
+      --gray-bg: #eef1f5;
+      --black: #111111;
+      --shadow: 0 12px 30px rgba(24, 33, 49, 0.08);
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Pretendard", "Noto Sans KR", system-ui, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    a,
+    button {
+      font: inherit;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      grid-template-rows: 72px 1fr;
+    }
+
+    .topbar {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+    }
+
+    .pill {
+      min-width: 108px;
+      padding: 12px 28px;
+      border-radius: 999px;
+      color: #fff;
+      background: var(--black);
+      text-align: center;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      font-size: 13px;
+    }
+
+    .account {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      color: #343841;
+      font-weight: 600;
+    }
+
+    .coin {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #f28b2e, #c76b19);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .sidebar {
+      background: var(--surface);
+      border-right: 1px solid var(--line);
+      padding: 22px 18px;
+    }
+
+    .nav {
+      display: grid;
+      gap: 12px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 10px;
+      border-radius: 10px;
+      color: #373b44;
+      font-size: 14px;
+      text-decoration: none;
+    }
+
+    .nav-item.active {
+      background: #eef7ff;
+      color: var(--blue-dark);
+      font-weight: 800;
+    }
+
+    .icon {
+      width: 20px;
+      height: 20px;
+      border: 1.8px solid currentColor;
+      border-radius: 5px;
+      display: inline-block;
+      position: relative;
+    }
+
+    .icon::before {
+      content: "";
+      position: absolute;
+      left: 4px;
+      right: 4px;
+      top: 5px;
+      height: 1.8px;
+      background: currentColor;
+    }
+
+    .main {
+      min-width: 0;
+      padding: 30px 32px 48px;
+    }
+
+    .page-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .breadcrumb {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+
+    h1, h2, h3, p {
+      margin: 0;
+    }
+
+    h1 {
+      margin-bottom: 8px;
+      font-size: 28px;
+      letter-spacing: -0.04em;
+    }
+
+    .page-head p {
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      height: 44px;
+      padding: 0 16px;
+      border-radius: 10px;
+      background: #f1f3f6;
+      color: #444b57;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+      transition: 0.18s ease;
+    }
+
+    .btn.primary {
+      background: var(--blue);
+      color: #fff;
+      box-shadow: 0 10px 20px rgba(31, 154, 243, 0.22);
+    }
+
+    .btn.outline {
+      background: #fff;
+      color: var(--blue-dark);
+      border: 1px solid #bfe0fb;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .hero {
+      margin-bottom: 20px;
+      padding: 22px 24px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, #fff 0%, #f6fbff 100%);
+      box-shadow: 0 4px 18px rgba(24, 33, 49, 0.04);
+    }
+
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .hero-top p {
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .hero-item {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.92);
+    }
+
+    .hero-item span {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .hero-item strong {
+      font-size: 15px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .badge.green {
+      color: var(--green);
+      background: var(--green-bg);
+    }
+
+    .badge.red {
+      color: var(--red);
+      background: var(--red-bg);
+    }
+
+    .badge.amber {
+      color: #b36b00;
+      background: var(--amber-bg);
+    }
+
+    .badge.purple {
+      color: var(--purple);
+      background: var(--purple-bg);
+    }
+
+    .badge.gray {
+      color: #657083;
+      background: var(--gray-bg);
+    }
+
+    .content-layout {
+      display: grid;
+      grid-template-columns: 290px minmax(0, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .lnb-card,
+    .panel-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: 0 4px 18px rgba(24, 33, 49, 0.04);
+      overflow: hidden;
+    }
+
+    .lnb-card {
+      position: sticky;
+      top: 24px;
+    }
+
+    .card-head {
+      padding: 20px 22px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .card-head h2 {
+      font-size: 18px;
+      letter-spacing: -0.03em;
+    }
+
+    .card-head p {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .lnb-list {
+      display: grid;
+      gap: 8px;
+      padding: 18px;
+    }
+
+    .lnb-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      color: #425062;
+      font-size: 14px;
+      font-weight: 700;
+      background: #fff;
+      border: 1px solid transparent;
+    }
+
+    .lnb-link.active {
+      color: var(--blue-dark);
+      background: #eef7ff;
+      border-color: #bfe0fb;
+    }
+
+    .lnb-meta {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .panel-stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .panel-card .card-body {
+      padding: 20px 22px 22px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .info-item {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fafcff;
+    }
+
+    .info-item span {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .info-item strong {
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .memo-box {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fafcff;
+      line-height: 1.7;
+      font-size: 13px;
+      color: #495566;
+    }
+
+    .table-wrap {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 14px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      font-size: 13px;
+      vertical-align: middle;
+    }
+
+    th {
+      background: #fafbfc;
+      color: #535b68;
+      font-weight: 800;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .split-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 18px;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: #f1f4f8;
+      border: 1px solid var(--line);
+      color: #495566;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 12px;
+    }
+
+    .timeline-item {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .timeline-item strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    .timeline-item span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .section-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .mini-btn {
+      height: 34px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid #dbe3ee;
+      color: #4e5b6d;
+      font-size: 12px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    @media (max-width: 1180px) {
+      .hero-grid,
+      .info-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .content-layout,
+      .split-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .lnb-card {
+        position: static;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .app {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto 1fr;
+      }
+
+      .topbar,
+      .page-head {
+        padding: 18px;
+        align-items: flex-start;
+        gap: 14px;
+        flex-direction: column;
+      }
+
+      .sidebar {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+        overflow-x: auto;
+      }
+
+      .nav {
+        display: flex;
+        min-width: max-content;
+      }
+
+      .main {
+        padding: 24px 16px 36px;
+      }
+
+      .hero-grid,
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+      }
+
+      table {
+        min-width: 840px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">GATE+</div>
+        <div class="pill">ACA</div>
+      </div>
+      <div class="account">
+        <div class="coin">DM</div>
+        <span>메이커스 어학원</span>
+        <span>관리자 김성명⌄</span>
+      </div>
+    </header>
+
+    <aside class="sidebar">
+      <nav class="nav">
+        <a href="#" class="nav-item"><span class="icon"></span>대시보드</a>
+        <a href="#" class="nav-item"><span class="icon"></span>수업 관리</a>
+        <a href="student-management.html" class="nav-item active"><span class="icon"></span>학생 관리</a>
+        <a href="#" class="nav-item"><span class="icon"></span>강사 관리</a>
+        <a href="#" class="nav-item"><span class="icon"></span>출결 관리</a>
+        <a href="#" class="nav-item"><span class="icon"></span>공지사항</a>
+        <a href="billing-admin.html" class="nav-item"><span class="icon"></span>수납/청구</a>
+        <a href="consultation-register.html" class="nav-item"><span class="icon"></span>상담 관리</a>
+        <a href="#" class="nav-item"><span class="icon"></span>카카오톡</a>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <div class="page-head">
+        <div>
+          <div class="breadcrumb">학생 관리 &gt; 학생 상세</div>
+          <h1>학생 상세</h1>
+          <p>학생 관리 페이지에서 학생 목록 행을 선택하면 진입하는 상세 화면입니다. 좌측 LNB에서 세부 영역을 전환하고, 우측 정보 영역에서 실제 데이터를 확인합니다.</p>
+        </div>
+        <div class="header-actions">
+          <a class="btn outline" href="student-management.html">학생 목록으로</a>
+          <a class="btn primary" href="consultation-register.html">상담 등록</a>
+        </div>
+      </div>
+
+      <section class="hero">
+        <div class="hero-top">
+          <div>
+            <h2>김학생</h2>
+            <p>매버릭스고 / 고1 · 학생번호 ST-2026-0041 · 담당자 관리자 김성명<br>최근 상담 2026.04.10 · 최근 수납 상태 정상 수납 · 카카오톡 개인 메시지 가능</p>
+          </div>
+          <div class="header-actions">
+            <span class="badge green">재원생</span>
+            <span class="badge amber">재확인 04.15</span>
+            <span class="badge green">정상 수납</span>
+          </div>
+        </div>
+        <div class="hero-grid">
+          <div class="hero-item">
+            <span>현재 수업</span>
+            <strong>2025 SAT 특강 외 1</strong>
+          </div>
+          <div class="hero-item">
+            <span>학생 휴대폰</span>
+            <strong>010-1234-5678</strong>
+          </div>
+          <div class="hero-item">
+            <span>학부모 휴대폰</span>
+            <strong>010-9876-5432</strong>
+          </div>
+          <div class="hero-item">
+            <span>후속 관리</span>
+            <strong>2026.04.15 재확인 예정</strong>
+          </div>
+          <div class="hero-item">
+            <span>최근 시험</span>
+            <strong>SAT 1400 / AP 4</strong>
+          </div>
+        </div>
+      </section>
+
+      <div class="content-layout">
+        <aside class="lnb-card">
+          <div class="card-head">
+            <h2>학생 상세 메뉴</h2>
+            <p>중요한 항목은 상단에, 후순위 항목은 하단에 배치했습니다.</p>
+          </div>
+          <div class="lnb-list">
+            <a href="#basic" class="lnb-link active"><span>1. 기본 학생 정보</span><span class="lnb-meta">핵심</span></a>
+            <a href="#memo" class="lnb-link"><span>2. 메모 / 특이사항</span><span class="lnb-meta">관리자</span></a>
+            <a href="#consulting" class="lnb-link"><span>3. 상담 내역</span><span class="lnb-meta">필수</span></a>
+            <a href="#attendance" class="lnb-link"><span>4. 출결 내역</span><span class="lnb-meta">수업</span></a>
+            <a href="#exam" class="lnb-link"><span>5. 시험</span><span class="lnb-meta">testgate</span></a>
+            <a href="#billing" class="lnb-link"><span>6. 수납 정보</span><span class="lnb-meta">청구</span></a>
+            <a href="#classes" class="lnb-link"><span>7. 수업 수강 이력</span><span class="lnb-meta">이력</span></a>
+            <a href="#progress" class="lnb-link"><span>8. 진도 / 과제</span><span class="lnb-meta">학습</span></a>
+            <a href="#feedback" class="lnb-link"><span>9. 강사 피드백</span><span class="lnb-meta">오늘</span></a>
+            <a href="#report" class="lnb-link"><span>10. 리포트 카드</span><span class="lnb-meta">후순위</span></a>
+          </div>
+        </aside>
+
+        <section class="panel-stack">
+          <article class="panel-card" id="basic">
+            <div class="card-head">
+              <h2>기본 학생 정보</h2>
+              <p>학생 상세 최상단에서 반드시 확인해야 하는 기본 정보와 연락 정보를 제공합니다.</p>
+            </div>
+            <div class="card-body">
+              <div class="info-grid">
+                <div class="info-item"><span>학생명</span><strong>김학생</strong></div>
+                <div class="info-item"><span>학교 / 학년</span><strong>매버릭스고 / 고1</strong></div>
+                <div class="info-item"><span>학생 상태</span><strong><span class="badge green">재원생</span></strong></div>
+                <div class="info-item"><span>카드번호</span><strong>ST-2026-0041</strong></div>
+                <div class="info-item"><span>학생 휴대폰</span><strong>010-1234-5678</strong></div>
+                <div class="info-item"><span>학부모 휴대폰</span><strong>010-9876-5432</strong></div>
+                <div class="info-item"><span>학생 이메일</span><strong>student@gateplus.kr</strong></div>
+                <div class="info-item"><span>학부모 이메일</span><strong>parent@gateplus.kr</strong></div>
+                <div class="info-item"><span>생년월일 / 성별</span><strong>2009.01.01 / 여</strong></div>
+                <div class="info-item"><span>주소</span><strong>서울시 강남구 테헤란로</strong></div>
+                <div class="info-item"><span>카카오톡 발송 가능</span><strong>가능</strong></div>
+                <div class="info-item"><span>최초 등록일</span><strong>2026.04.10</strong></div>
+              </div>
+              <div class="section-actions">
+                <a class="mini-btn" href="student-register.html">학생 정보 수정</a>
+                <a class="mini-btn" href="#">메시지 발송</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="panel-card" id="memo">
+            <div class="card-head">
+              <h2>메모 / 특이사항</h2>
+              <p>관리자가 학생 응대 시 먼저 확인해야 하는 주의 메모와 내부 기록입니다.</p>
+            </div>
+            <div class="card-body">
+              <div class="memo-box">
+                학부모는 주말 상담을 선호하며, 등록 여부는 4월 중순에 최종 결정 예정입니다. 학생은 독해가 강점이고 수학 파트 보강이 필요합니다. 카카오톡 개인 메시지 발송 가능 상태이며, 최근 상담 후 2026.04.15에 재확인 예정으로 표시되어 있습니다.
+              </div>
+            </div>
+          </article>
+
+          <article class="panel-card" id="consulting">
+            <div class="card-head">
+              <h2>상담 내역</h2>
+              <p>상담 등록 화면과 연결되는 누적 상담 기록과 후속 관리 상태를 보여줍니다.</p>
+            </div>
+            <div class="card-body">
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>상담일</th>
+                      <th>상담 구분</th>
+                      <th>상담 경로</th>
+                      <th>상담 대상</th>
+                      <th>상담 내용 요약</th>
+                      <th>후속 관리</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>2026.04.10</td>
+                      <td>입학 수강상담</td>
+                      <td>전화</td>
+                      <td>학부모</td>
+                      <td>목표 점수와 주말반 수강 가능 여부 문의</td>
+                      <td><span class="badge amber">재확인 04.15</span></td>
+                    </tr>
+                    <tr>
+                      <td>2026.03.25</td>
+                      <td>재원 상담</td>
+                      <td>방문</td>
+                      <td>학생 + 학부모</td>
+                      <td>수업 적응 상태 및 여름 특강 추천 상담</td>
+                      <td><span class="badge gray">완료</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </article>
+
+          <div class="split-grid">
+            <article class="panel-card" id="attendance">
+              <div class="card-head">
+                <h2>출결 내역</h2>
+                <p>최근 출결 패턴과 지각/결석 이슈를 확인합니다.</p>
+              </div>
+              <div class="card-body">
+                <div class="timeline">
+                  <div class="timeline-item">
+                    <strong>2026.04.12 · SAT 특강</strong>
+                    <span>출석 · 수업 시작 5분 전 입실</span>
+                  </div>
+                  <div class="timeline-item">
+                    <strong>2026.04.09 · AP Writing</strong>
+                    <span>지각 · 12분 지각, 사전 연락 있음</span>
+                  </div>
+                  <div class="timeline-item">
+                    <strong>2026.04.05 · SAT 특강</strong>
+                    <span>출석 · 과제 제출 완료</span>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <article class="panel-card" id="exam">
+              <div class="card-head">
+                <h2>시험</h2>
+                <p>testgate 연동 또는 수동 입력된 시험 결과를 보여주는 영역입니다.</p>
+              </div>
+              <div class="card-body">
+                <div class="chip-row">
+                  <span class="chip">SAT 1400</span>
+                  <span class="chip">AP 4점</span>
+                  <span class="chip">ACT Composite 12</span>
+                </div>
+                <div class="section-actions">
+                  <a class="mini-btn" href="#">시험 상세 보기</a>
+                  <a class="mini-btn" href="#">testgate 연결 확인</a>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <article class="panel-card" id="billing">
+            <div class="card-head">
+              <h2>수납 정보</h2>
+              <p>학생별 청구서, 수납, 미수, 환불 이력을 학생 상세에서 바로 확인합니다.</p>
+            </div>
+            <div class="card-body">
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>청구서 번호</th>
+                      <th>청구월</th>
+                      <th>청구액</th>
+                      <th>수납액</th>
+                      <th>잔액</th>
+                      <th>상태</th>
+                      <th>최근 처리</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>INV-202604-000123</td>
+                      <td>2026-04</td>
+                      <td>420,000원</td>
+                      <td>420,000원</td>
+                      <td>0원</td>
+                      <td><span class="badge green">완납</span></td>
+                      <td>2026.04.12 수납 완료</td>
+                    </tr>
+                    <tr>
+                      <td>INV-202603-000097</td>
+                      <td>2026-03</td>
+                      <td>380,000원</td>
+                      <td>380,000원</td>
+                      <td>0원</td>
+                      <td><span class="badge green">완납</span></td>
+                      <td>2026.03.08 수납 완료</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="section-actions">
+                <a class="mini-btn" href="billing-admin.html">수납/청구 화면으로 이동</a>
+              </div>
+            </div>
+          </article>
+
+          <div class="split-grid">
+            <article class="panel-card" id="classes">
+              <div class="card-head">
+                <h2>수업 수강 이력</h2>
+                <p>현재 및 과거 수강 이력, 담당 강사, 진행 상태를 보여줍니다.</p>
+              </div>
+              <div class="card-body">
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>수업명</th>
+                        <th>기간</th>
+                        <th>담당 강사</th>
+                        <th>상태</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>2025 SAT 특강</td>
+                        <td>2026.03 ~ 2026.05</td>
+                        <td>김팀장</td>
+                        <td><span class="badge green">수강 중</span></td>
+                      </tr>
+                      <tr>
+                        <td>AP Writing</td>
+                        <td>2026.04 ~ 2026.06</td>
+                        <td>이실장</td>
+                        <td><span class="badge purple">예정</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </article>
+
+            <article class="panel-card" id="progress">
+              <div class="card-head">
+                <h2>진도 / 과제</h2>
+                <p>현재 학습 진도와 과제 제출 상태를 요약합니다.</p>
+              </div>
+              <div class="card-body">
+                <div class="timeline">
+                  <div class="timeline-item">
+                    <strong>SAT 독해 진도 68%</strong>
+                    <span>이번 주 과제 2건 중 2건 제출 완료</span>
+                  </div>
+                  <div class="timeline-item">
+                    <strong>수학 보강 필요</strong>
+                    <span>최근 모의고사 기준 Algebra 파트 오답률 높음</span>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <div class="split-grid">
+            <article class="panel-card" id="feedback">
+              <div class="card-head">
+                <h2>강사 피드백</h2>
+                <p>오늘의 피드백 또는 최근 수업 기준 강사 코멘트를 모아 보여줍니다.</p>
+              </div>
+              <div class="card-body">
+                <div class="memo-box">
+                  오늘 수업에서 독해 집중력이 좋았고 질문 반응도 적극적이었습니다. 다만 시간 제한이 있는 수학 문제에서는 초반 풀이 속도가 다소 느렸습니다. 다음 수업 전까지 algebra drill 과제 복습이 필요합니다.
+                </div>
+              </div>
+            </article>
+
+            <article class="panel-card" id="report">
+              <div class="card-head">
+                <h2>리포트 카드</h2>
+                <p>후순위 기능으로 관리되는 성과 리포트 또는 월간 요약 카드 영역입니다.</p>
+              </div>
+              <div class="card-body">
+                <div class="timeline">
+                  <div class="timeline-item">
+                    <strong>2026년 4월 월간 리포트</strong>
+                    <span>출결 안정적 / 상담 후속 1건 / 수납 정상 / SAT 점수 목표 유지</span>
+                  </div>
+                  <div class="timeline-item">
+                    <strong>추천 액션</strong>
+                    <span>여름 특강 제안, 수학 보강 상담, 4월 15일 학부모 재확인</span>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
